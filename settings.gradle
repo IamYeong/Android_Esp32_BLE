@@ -1,0 +1,2 @@
+rootProject.name = "Esp32BleManager"
+include ':app'
