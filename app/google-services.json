@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "1084283415265",
+    "project_id": "tr-projects-c97d9",
+    "storage_bucket": "tr-projects-c97d9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1084283415265:android:f6bdedc897f2d33591e5a0",
+        "android_client_info": {
+          "package_name": "com.iamyeong.trproject"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1084283415265-p1sh9pboq9b9tenhs9qkihd4treovahl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAbH_mtV-a00S1Zia3KqSn6rGBFydm2Mmw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1084283415265-p1sh9pboq9b9tenhs9qkihd4treovahl.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1084283415265:android:de16f2f5f65b33ea91e5a0",
+        "android_client_info": {
+          "package_name": "kr.co.theresearcher.esp32blemanager"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1084283415265-p1sh9pboq9b9tenhs9qkihd4treovahl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAbH_mtV-a00S1Zia3KqSn6rGBFydm2Mmw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1084283415265-p1sh9pboq9b9tenhs9qkihd4treovahl.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

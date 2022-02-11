@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".BleCommunicationActivity"
+    android:orientation="vertical"
+    >
+
+    <LinearLayout
+        android:id="@+id/linear_info_bar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:orientation="horizontal"
+        android:gravity="right"
+
+        app:layout_constraintTop_toTopOf="parent"
+        >
+
+        <TextView
+            android:id="@+id/tv_ble_name_and_address"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:textColor="@color/black"
+            android:text="Spirokit : 7E:3A ..."
+            android:layout_weight="2"
+            android:textAlignment="textStart"
+
+            android:layout_margin="5dp"
+
+            />
+
+        <android.widget.Button
+            android:id="@+id/btn_connect_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Connect"
+            android:layout_margin="3dp"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+
+        app:layout_constraintTop_toBottomOf="@id/linear_info_bar"
+
+        >
+        <include
+            layout="@layout/item_characteristic_select_layout"
+
+            />
+
+        <include
+            layout="@layout/item_count_byte_layout"
+            />
+
+        <TextView
+            android:id="@+id/tv_receive_data"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Receive data"
+
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:textSize="25sp"
+
+            android:layout_gravity="center_horizontal"
+            />
+
+        <TextView
+            android:id="@+id/tv_receive_byte"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Receive byte"
+
+            android:textColor="@color/grey"
+            android:textSize="18sp"
+
+            android:layout_gravity="center_horizontal"
+            />
+
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/et_command"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/btn_send_byte"
+        android:hint="command"
+        />
+
+
+    <android.widget.Button
+        android:id="@+id/btn_send_byte"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="전송"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        />
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

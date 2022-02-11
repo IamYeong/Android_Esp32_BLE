@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_margin="10dp"
+    app:cardUseCompatPadding="true"
+    app:cardCornerRadius="8dp"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+
+            android:layout_margin="10dp"
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TX : "
+                android:layout_weight="2"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                />
+
+            <TextView
+                android:id="@+id/tv_characteristic_tx"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/custom_blue"
+                android:text="characteristic"
+                android:layout_weight="2"
+                android:textSize="20sp"
+                />
+
+            <ImageButton
+                android:id="@+id/imgbtn_find_tx_characteristic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="찾기"
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_baseline_search_24"
+                />
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+
+            android:layout_margin="10dp"
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="RX : "
+                android:layout_weight="2"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                />
+
+            <TextView
+                android:id="@+id/tv_characteristic_rx"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/custom_blue"
+                android:text="characteristic"
+                android:layout_weight="2"
+                android:textSize="20sp"
+                />
+
+            <ImageButton
+                android:id="@+id/imgbtn_find_rx_characteristic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="찾기"
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_baseline_search_24"
+                />
+
+
+        </LinearLayout>
+
+
+        <android.widget.Button
+            android:id="@+id/btn_run"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="RUN"
+
+            android:layout_margin="10dp"
+            />
+
+    </LinearLayout>
+
+
+
+</androidx.cardview.widget.CardView>

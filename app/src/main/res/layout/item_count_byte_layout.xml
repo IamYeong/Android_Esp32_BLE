@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardUseCompatPadding="true"
+    android:layout_margin="10dp"
+    app:cardCornerRadius="8dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            >
+
+            <TextView
+                android:id="@+id/tv_tx_byte_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TX : 0 Bytes"
+                android:layout_margin="10dp"
+
+                android:textSize="15sp"
+                android:textColor="@color/black"
+                />
+
+            <ImageButton
+                android:id="@+id/imgbtn_initial_tx_byte_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_baseline_wifi_protected_setup_24"
+                android:layout_margin="10dp"
+                />
+
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            >
+
+            <TextView
+                android:id="@+id/tv_rx_byte_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="RX : 0 Bytes"
+                android:layout_margin="10dp"
+
+                android:textSize="15sp"
+                android:textColor="@color/black"
+                />
+
+            <ImageButton
+                android:id="@+id/imgbtn_initial_rx_byte_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_baseline_wifi_protected_setup_24"
+                android:layout_margin="10dp"
+                />
+
+
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+
+
+
+</androidx.cardview.widget.CardView>
