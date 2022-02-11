@@ -3,6 +3,7 @@ package kr.co.theresearcher.esp32blemanager;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.le.ScanResult;
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,14 +20,13 @@ public class DevicesAdapter extends RecyclerView.Adapter<DevicesViewHolder> {
 
     private List<ScanResult> deviceScanResults;
     private Context context;
-    private OnDeviceSelectListener listener;
+    //private OnDeviceSelectListener listener;
 
-    public DevicesAdapter(Context context, OnDeviceSelectListener listener) {
+    public DevicesAdapter(Context context) {
         deviceScanResults = new ArrayList<>();
-        this.listener = listener;
+        //this.listener = listener;
         this.context = context;
     }
-
 
 
     public void addDevice(ScanResult device) {
@@ -52,6 +52,7 @@ public class DevicesAdapter extends RecyclerView.Adapter<DevicesViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull DevicesViewHolder holder, int position) {
 
+
         StringBuilder builder = new StringBuilder();
         builder.append(deviceScanResults.get(position).getDevice().getName());
         if (builder.toString().equals("")) {
@@ -64,7 +65,9 @@ public class DevicesAdapter extends RecyclerView.Adapter<DevicesViewHolder> {
             @Override
             public void onClick(View view) {
 
-                listener.onSelectDevice(deviceScanResults.get(position));
+                Intent intent = new Intent(context, BleCommunicationActivity.class);
+                intent.putExtra("SCAN.RESULT", deviceScanResults.get(position));
+                context.startActivity(intent);
 
             }
         });

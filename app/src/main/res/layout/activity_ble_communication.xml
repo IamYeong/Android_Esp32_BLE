@@ -9,6 +9,7 @@
     android:orientation="vertical"
     >
 
+
     <LinearLayout
         android:id="@+id/linear_info_bar"
         android:layout_width="match_parent"
@@ -43,12 +44,30 @@
 
     </LinearLayout>
 
+
+    <TextView
+        android:id="@+id/tv_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        app:layout_constraintTop_toBottomOf="@id/linear_info_bar"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+
+        android:textSize="20sp"
+        android:text="현재 상태"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+
+        />
+
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
 
-        app:layout_constraintTop_toBottomOf="@id/linear_info_bar"
+        app:layout_constraintTop_toBottomOf="@id/tv_status"
 
         >
         <include

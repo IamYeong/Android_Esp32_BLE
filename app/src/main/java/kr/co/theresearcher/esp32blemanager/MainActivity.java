@@ -129,18 +129,7 @@ public class MainActivity extends AppCompatActivity {
 
         scanner = new BleScanner(this, listener);
 
-        adapter = new DevicesAdapter(this, new OnDeviceSelectListener() {
-            @Override
-            public void onSelectDevice(ScanResult result) {
-
-                currentStatusText.setText(("BLE 서비스 연결 중"));
-                scanResult = result;
-                Intent intent = new Intent(getApplicationContext(), BleService.class);
-                bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
-
-
-            }
-        });
+        adapter = new DevicesAdapter(this);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
         rv.setLayoutManager(linearLayoutManager);
@@ -187,7 +176,7 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
 
         scanner.stopScan();
-        currentStatusText.setText("스캔 중지");
+        //currentStatusText.setText("스캔 중지");
     }
 
     @Override

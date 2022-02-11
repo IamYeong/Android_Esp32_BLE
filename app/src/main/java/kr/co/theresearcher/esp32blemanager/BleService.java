@@ -1,5 +1,6 @@
 package kr.co.theresearcher.esp32blemanager;
 
+import android.app.Dialog;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -18,6 +19,7 @@ import android.os.Looper;
 
 import androidx.annotation.NonNull;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -27,6 +29,11 @@ public class BleService extends Service {
     private final IBinder mBinder = new LocalBinder();
     private Queue<char[]> mQueue = new LinkedList<>();
     private Thread thread;
+
+    private char findCharacteristicStatus = 0x00;
+    private BluetoothGattCharacteristic readCharacteristic;
+    private BluetoothGattCharacteristic writeCharacteristic;
+    private OnSelectCharacteristicListener mListener;
 
     private BluetoothAdapter bluetoothAdapter;
     private BluetoothManager bluetoothManager;
@@ -56,16 +63,37 @@ public class BleService extends Service {
             super.onServicesDiscovered(gatt, status);
 
             List<BluetoothGattService> services = gatt.getServices();
+            List<BluetoothGattCharacteristic> characteristics = new ArrayList<>();
 
             for (BluetoothGattService service : services) {
 
                 for (BluetoothGattCharacteristic characteristic : service.getCharacteristics()) {
 
-
+                    characteristics.add(characteristic);
 
                 }
 
             }
+
+            CharacteristicsDialog dialog = new CharacteristicsDialog(BleService.this);
+            dialog.setCharacteristics(characteristics);
+            dialog.setSelectListener(new OnSelectCharacteristicListener() {
+                @Override
+                public void onSelectCharacteristic(BluetoothGattCharacteristic characteristic) {
+
+                    if (findCharacteristicStatus == 0x00) {
+                        readCharacteristic = characteristic;
+                        mListener.onSelectCharacteristic(readCharacteristic);
+
+                    } else if (findCharacteristicStatus == 0x01) {
+                        writeCharacteristic = characteristic;
+                        mListener.onSelectCharacteristic(writeCharacteristic);
+                    }
+
+                }
+            });
+
+            dialog.show();
 
         }
 
@@ -82,6 +110,7 @@ public class BleService extends Service {
         @Override
         public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
             super.onCharacteristicChanged(gatt, characteristic);
+            readCharacteristic(characteristic);
         }
 
         @Override
@@ -177,8 +206,9 @@ public class BleService extends Service {
 
     }
 
-    public void discoverServices() {
+    public void discoverServices(char findTarget) {
         if (bluetoothGatt != null) {
+            findCharacteristicStatus = findTarget;
             bluetoothGatt.discoverServices();
         }
     }
@@ -199,6 +229,9 @@ public class BleService extends Service {
 
     }
 
+    public void setCharacteristicListener(OnSelectCharacteristicListener listener) {
+        mListener = listener;
+    }
 
 
     @Override
@@ -207,6 +240,24 @@ public class BleService extends Service {
     }
 
     private void readCharacteristic(BluetoothGattCharacteristic characteristic) {
+
+        if (characteristic.getValue() != null) {
+
+            byte[] data = characteristic.getValue();
+            char[] buffer = new char[data.length];
+            for (int i = 0; i < data.length; i++) {
+                buffer[i] = (char)data[i];
+            }
+
+            mQueue.offer(buffer);
+
+        }
+
+    }
+
+    public void writeCharacteristic() {
+
+
 
     }
 
