@@ -44,8 +44,8 @@ public class BleScanner {
         scanner = bluetoothAdapter.getBluetoothLeScanner();
 
         scanFilter = new ScanFilter.Builder()
-                //.setDeviceName();
-                //.setDeviceAddress();
+                .setDeviceName("SpiroKit-E")
+                .setDeviceAddress("3C:61:05:11:CC:A2")
                 .build();
 
         scanSettings = new ScanSettings.Builder()

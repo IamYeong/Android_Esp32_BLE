@@ -34,14 +34,6 @@
 
             />
 
-        <android.widget.Button
-            android:id="@+id/btn_connect_switch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Connect"
-            android:layout_margin="3dp"
-            />
-
     </LinearLayout>
 
 
@@ -70,10 +62,7 @@
         app:layout_constraintTop_toBottomOf="@id/tv_status"
 
         >
-        <include
-            layout="@layout/item_characteristic_select_layout"
 
-            />
 
         <include
             layout="@layout/item_count_byte_layout"

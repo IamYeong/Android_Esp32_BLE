@@ -24,6 +24,7 @@ public class CharacteristicsDialog extends Dialog {
     public CharacteristicsDialog(@NonNull Context context) {
         super(context);
         this.context = context;
+
     }
 
     public void setSelectListener(OnSelectCharacteristicListener listener) {
@@ -37,6 +38,7 @@ public class CharacteristicsDialog extends Dialog {
 
         cancelButton = findViewById(R.id.btn_cancel_characteristic_dialog);
         rv = findViewById(R.id.rv_characteristic_dialog);
+        adapter = new CharacteristicsAdapter();
 
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -45,12 +47,12 @@ public class CharacteristicsDialog extends Dialog {
             }
         });
 
-        adapter = new CharacteristicsAdapter();
+
         adapter.setListener(new OnSelectCharacteristicListener() {
             @Override
-            public void onSelectCharacteristic(BluetoothGattCharacteristic characteristic) {
+            public void onSelectCharacteristic(List<BluetoothGattCharacteristic> characteristics) {
 
-                mListener.onSelectCharacteristic(characteristic);
+                mListener.onSelectCharacteristic(characteristics);
                 dismiss();
 
             }

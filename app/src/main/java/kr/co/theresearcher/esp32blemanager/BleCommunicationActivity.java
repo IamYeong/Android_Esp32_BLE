@@ -2,6 +2,7 @@ package kr.co.theresearcher.esp32blemanager;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.le.ScanResult;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -10,26 +11,36 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
+import android.os.Message;
+import android.os.Messenger;
+import android.service.controls.Control;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import java.util.List;
+
 public class BleCommunicationActivity extends AppCompatActivity {
 
 
-    private ImageButton findTxButton, findRxButton, txCountInitialButton, rxCountInitialButton;
-    private TextView deviceNameAndAddress, txCharacteristicText, rxCharacteristicText, receiveDataText, receiveByteText;
+    private ImageButton txCountInitialButton, rxCountInitialButton;
+    private TextView deviceNameAndAddress, receiveDataText, receiveByteText;
     private TextView txByteCountText, rxByteCountText, statusText;
     private EditText sendCommandTextField;
-    private Button sendCommandButton, connectSwitchButton, runButton;
+    private Button sendCommandButton;
 
     private ScanResult scanResult;
     private int txCount, rxCount;
+    private char characteristicStatus = 0x00;
     private BleService mService;
     private boolean isConnected = false;
+
+    private Handler handler = new Handler();
 
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
@@ -39,21 +50,54 @@ public class BleCommunicationActivity extends AppCompatActivity {
 
             if (action.equals(BleAttributes.ACTION_GATT_AVAILABLE_DATA)) {
 
+                StringBuilder builder = new StringBuilder();
+                char[] data = intent.getCharArrayExtra(BleAttributes.EXTRA_GATT_DATA);
+                txCount += data.length;
+                txByteCountText.setText(("TX : " + String.valueOf(txCount) + " Bytes"));
+                for (char c : data) {
+                    builder.append(c);
+                }
+
+                receiveDataText.setText(builder.toString());
+
+                /*
+                StringBuilder builder1 = new StringBuilder();
+                for (char c : data) {
+                    builder1.append()
+                }
+
+                 */
+
+
             } else if (action.equals(BleAttributes.ACTION_GATT_CONNECTED)) {
+
+                statusText.setText(("CONNECTED"));
 
             } else if (action.equals(BleAttributes.ACTION_GATT_CONNECTING)) {
 
+                statusText.setText(("CONNECTING"));
+
             } else if (action.equals(BleAttributes.ACTION_GATT_DISCONNECTED)) {
+
+                statusText.setText(("DISCONNECTED"));
 
             } else if (action.equals(BleAttributes.ACTION_GATT_DISCONNECTING)) {
 
+                statusText.setText(("DISCONNECTING"));
+
             } else if (action.equals(BleAttributes.ACTION_GATT_SERVICES_DISCOVERED)) {
+
+                statusText.setText(("DISCOVERED"));
 
             } else if (action.equals(BleAttributes.ACTION_WRITE_DESCRIPTOR)) {
 
+                statusText.setText(("WRITE DESCRIPTOR"));
+
             } else if (action.equals(BleAttributes.ACTION_READ_DESCRIPTOR)) {
 
-            } else {
+            } else if (action.equals(BleAttributes.ACTION_WRITE_CHARACTERISTIC)) {
+
+                statusText.setText(("WRITE CHARACTERISTIC"));
 
             }
 
@@ -64,15 +108,13 @@ public class BleCommunicationActivity extends AppCompatActivity {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
 
-            mService = ((BleService.LocalBinder) iBinder).getService();
+            mService = ((BleService.LocalBinder)iBinder).getService();
             mService.connect(scanResult.getDevice().getAddress());
 
         }
 
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
-
-            statusText.setText(("Service Disconnected"));
 
         }
     };
@@ -92,60 +134,19 @@ public class BleCommunicationActivity extends AppCompatActivity {
 
         deviceNameAndAddress.setText(stringBuilder.toString());
 
-        connectSwitchButton.setOnClickListener(new View.OnClickListener() {
+        txCountInitialButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                if (isConnected) {
-
-                    connectSwitchButton.setText(("연결끊는 중"));
-                    if (mService != null) {
-                        mService.close();
-                        mService.disconnect();
-                        unbindService(serviceConnection);
-                        return;
-                    }
-
-                    connectSwitchButton.setText(("연결끊김"));
-
-
-                } else {
-
-                    connectSwitchButton.setText(("연결 중"));
-                    Intent serviceIntent = new Intent(getApplicationContext(), BleService.class);
-                    bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
-
-                }
-
+                txCount = 0;
+                txByteCountText.setText(("TX : 0 Bytes"));
             }
         });
 
-        findTxButton.setOnClickListener(new View.OnClickListener() {
+        rxCountInitialButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                //Dialog 불렀다가 값 return 받아서
-                txCharacteristicText.setText("?");
-                //mService.setTxCharacteristic();
-
-            }
-        });
-
-        findRxButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-
-
-            }
-        });
-
-        runButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (mService != null) {
-                    mService.run();
-                }
+                rxCount = 0;
+                rxByteCountText.setText(("RX : 0 Bytes"));
             }
         });
 
@@ -154,37 +155,49 @@ public class BleCommunicationActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 String command = sendCommandTextField.getText().toString();
-                char[] data;
+                byte[] data;
                 if (command.equals("")) {
                     return;
                 }
 
-                data = new char[command.length()];
+                data = new byte[command.length()];
+
 
                 for (int i = 0; i < command.length(); i++){
 
-                    data[i] = command.charAt(i);
+                    data[i] = (byte)command.charAt(i);
 
                 }
 
-                //mService.writeData(data);
+                //여기서 null
+                if (mService.writeCharacteristic(data)) {
+                    rxCount += command.length();
+                    rxByteCountText.setText(("RX : " + String.valueOf(rxCount) + " Bytes"));
+                }
+
+
 
             }
         });
 
+        Intent serviceIntent = new Intent(getApplicationContext(), BleService.class);
+        bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
 
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        unbindService(serviceConnection);
 
     }
 
     private void allFindViewById() {
 
         deviceNameAndAddress = findViewById(R.id.tv_ble_name_and_address);
-        connectSwitchButton = findViewById(R.id.btn_connect_switch);
-        txCharacteristicText = findViewById(R.id.tv_characteristic_tx);
-        rxCharacteristicText = findViewById(R.id.tv_characteristic_rx);
-        findTxButton = findViewById(R.id.imgbtn_find_tx_characteristic);
-        findRxButton = findViewById(R.id.imgbtn_find_rx_characteristic);
-        runButton = findViewById(R.id.btn_run);
+
         receiveDataText = findViewById(R.id.tv_receive_data);
         receiveByteText = findViewById(R.id.tv_receive_byte);
         sendCommandTextField = findViewById(R.id.et_command);

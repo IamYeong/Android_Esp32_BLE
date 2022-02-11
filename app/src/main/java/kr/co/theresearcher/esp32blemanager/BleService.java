@@ -30,11 +30,6 @@ public class BleService extends Service {
     private Queue<char[]> mQueue = new LinkedList<>();
     private Thread thread;
 
-    private char findCharacteristicStatus = 0x00;
-    private BluetoothGattCharacteristic readCharacteristic;
-    private BluetoothGattCharacteristic writeCharacteristic;
-    private OnSelectCharacteristicListener mListener;
-
     private BluetoothAdapter bluetoothAdapter;
     private BluetoothManager bluetoothManager;
     private BluetoothDevice bluetoothDevice;
@@ -46,11 +41,26 @@ public class BleService extends Service {
 
             if (newState == BluetoothProfile.STATE_CONNECTED) {
 
+                Intent intent = new Intent(BleAttributes.ACTION_GATT_CONNECTED);
+                sendBroadcast(intent);
+                gatt.discoverServices();
+
             } else if (newState == BluetoothProfile.STATE_CONNECTING) {
+
+                Intent intent = new Intent(BleAttributes.ACTION_GATT_CONNECTING);
+                sendBroadcast(intent);
 
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
 
+                Intent intent = new Intent(BleAttributes.ACTION_GATT_DISCONNECTED);
+                sendBroadcast(intent);
+
+                gatt.connect();
+
             } else if (newState == BluetoothProfile.STATE_DISCONNECTING) {
+
+                Intent intent = new Intent(BleAttributes.ACTION_GATT_DISCONNECTING);
+                sendBroadcast(intent);
 
             } else {
 
@@ -63,48 +73,40 @@ public class BleService extends Service {
             super.onServicesDiscovered(gatt, status);
 
             List<BluetoothGattService> services = gatt.getServices();
-            List<BluetoothGattCharacteristic> characteristics = new ArrayList<>();
 
             for (BluetoothGattService service : services) {
 
                 for (BluetoothGattCharacteristic characteristic : service.getCharacteristics()) {
+                    if (characteristic.getUuid().toString().equals(BleAttributes.ESP32_TX_CHARACTERISTIC_UUID.toString())) {
 
-                    characteristics.add(characteristic);
+                        gatt.setCharacteristicNotification(characteristic, true);
+                        Intent intent = new Intent(BleAttributes.ACTION_GATT_SERVICES_DISCOVERED);
+                        sendBroadcast(intent);
+
+                        BluetoothGattDescriptor descriptor = characteristic.getDescriptor(BleAttributes.ESP32_DESCRIPTOR_UUID);
+                        descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+                        gatt.writeDescriptor(descriptor);
+
+                    }
 
                 }
 
             }
-
-            CharacteristicsDialog dialog = new CharacteristicsDialog(BleService.this);
-            dialog.setCharacteristics(characteristics);
-            dialog.setSelectListener(new OnSelectCharacteristicListener() {
-                @Override
-                public void onSelectCharacteristic(BluetoothGattCharacteristic characteristic) {
-
-                    if (findCharacteristicStatus == 0x00) {
-                        readCharacteristic = characteristic;
-                        mListener.onSelectCharacteristic(readCharacteristic);
-
-                    } else if (findCharacteristicStatus == 0x01) {
-                        writeCharacteristic = characteristic;
-                        mListener.onSelectCharacteristic(writeCharacteristic);
-                    }
-
-                }
-            });
-
-            dialog.show();
 
         }
 
         @Override
         public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
             super.onCharacteristicRead(gatt, characteristic, status);
+
+            readCharacteristic(characteristic);
         }
 
         @Override
         public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
             super.onCharacteristicWrite(gatt, characteristic, status);
+            Intent intent = new Intent(BleAttributes.ACTION_WRITE_CHARACTERISTIC);
+            sendBroadcast(intent);
         }
 
         @Override
@@ -121,6 +123,9 @@ public class BleService extends Service {
         @Override
         public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
             super.onDescriptorWrite(gatt, descriptor, status);
+
+            Intent intent = new Intent(BleAttributes.ACTION_WRITE_DESCRIPTOR);
+            sendBroadcast(intent);
         }
 
         @Override
@@ -141,9 +146,12 @@ public class BleService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-        thread.interrupt();
+        //thread.interrupt();
         return mBinder;
     }
+
+
+
 
     private void startQueue() {
 
@@ -179,15 +187,14 @@ public class BleService extends Service {
             }
         };
 
-    }
-
-    public void run() {
-
-        startQueue();
+        thread.start();
 
     }
+
 
     public void connect(String deviceAddress) {
+
+        initialize();
 
         bluetoothDevice = bluetoothAdapter.getRemoteDevice(deviceAddress);
         bluetoothGatt = bluetoothDevice.connectGatt(this, false, gattCallback);
@@ -206,13 +213,6 @@ public class BleService extends Service {
 
     }
 
-    public void discoverServices(char findTarget) {
-        if (bluetoothGatt != null) {
-            findCharacteristicStatus = findTarget;
-            bluetoothGatt.discoverServices();
-        }
-    }
-
     public void close() {
 
         if (bluetoothGatt != null) {
@@ -229,13 +229,10 @@ public class BleService extends Service {
 
     }
 
-    public void setCharacteristicListener(OnSelectCharacteristicListener listener) {
-        mListener = listener;
-    }
-
 
     @Override
     public boolean onUnbind(Intent intent) {
+        //thread.interrupt();
         return super.onUnbind(intent);
     }
 
@@ -255,10 +252,26 @@ public class BleService extends Service {
 
     }
 
-    public void writeCharacteristic() {
+    public boolean writeCharacteristic(byte[] data) {
 
+        for (BluetoothGattService service : bluetoothGatt.getServices()) {
 
+            for (BluetoothGattCharacteristic characteristic : service.getCharacteristics()) {
+
+                if (characteristic.getUuid().toString().equals(BleAttributes.ESP32_RX_CHARACTERISTIC_UUID.toString())) {
+
+                    characteristic.setValue(data);
+                    return bluetoothGatt.writeCharacteristic(characteristic);
+
+                }
+
+            }
+
+        }
+
+        return false;
 
     }
+
 
 }

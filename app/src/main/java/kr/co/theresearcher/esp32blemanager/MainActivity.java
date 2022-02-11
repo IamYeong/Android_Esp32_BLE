@@ -14,6 +14,7 @@ import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -29,13 +30,10 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
-    private RecyclerView rv;
-    private Button bleSwitch, deviceScanButton;
-    private TextView currentStatusText;
-    private DevicesAdapter adapter;
+
+    private Button startButton;
     private BleScanner scanner;
     private ScanResult scanResult;
-    private BleService mService;
 
     private String[] permissions = new String[] {
             Manifest.permission.ACCESS_FINE_LOCATION,
@@ -80,39 +78,11 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onScan(ScanResult result) {
 
-            adapter.addDevice(result);
-
-        }
-    };
-
-    private BroadcastReceiver receiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-
-            String action = intent.getAction();
+            startButton.setText((result.getDevice().getName() + "연결"));
+            scanResult = result;
 
 
 
-        }
-    };
-
-
-    private ServiceConnection serviceConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-
-            currentStatusText.setText(("BLE 서비스 연결 완료"));
-
-            mService = ((BleService.LocalBinder)iBinder).getService();
-            mService.connect(scanResult.getDevice().getAddress());
-
-
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-
-            currentStatusText.setText(("BLE 서비스 연결 종료"));
         }
     };
 
@@ -121,52 +91,16 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        startButton = findViewById(R.id.btn_start);
 
-        rv = findViewById(R.id.rv_main);
-        bleSwitch = findViewById(R.id.imgbtn_main_switch);
-        deviceScanButton = findViewById(R.id.imgbtn_main_scan_switch);
-        currentStatusText = findViewById(R.id.tv_main_current_status);
-
-        scanner = new BleScanner(this, listener);
-
-        adapter = new DevicesAdapter(this);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
-        rv.setLayoutManager(linearLayoutManager);
-        rv.setAdapter(adapter);
-
-        bleSwitch.setOnClickListener(new View.OnClickListener() {
+        startButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                scanner.enableBluetoothLe();
-
+                Intent intent = new Intent(MainActivity.this, BleCommunicationActivity.class);
+                intent.putExtra("SCAN.RESULT", scanResult);
+                startActivity(intent);
             }
         });
-
-        deviceScanButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                if (scanner.isScanning()) {
-
-                    scanner.stopScan();
-                    currentStatusText.setText("스캔 중지");
-
-                } else {
-
-                    scanner.readyScan();
-                    scanner.startScan();
-                    currentStatusText.setText("스캔 중");
-
-                }
-
-
-
-            }
-        });
-
-
 
     }
 
@@ -176,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
 
         scanner.stopScan();
-        //currentStatusText.setText("스캔 중지");
+        //currentstartButton.setText("스캔 중지");
     }
 
     @Override
@@ -185,12 +119,16 @@ public class MainActivity extends AppCompatActivity {
 
         activityResultLauncher.launch(permissions);
 
+        scanner = new BleScanner(this, listener);
+        scanner.enableBluetoothLe();
+        scanner.readyScan();
+        scanner.startScan();
+
 
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        unbindService(serviceConnection);
-    }
+
+
+
+
 }

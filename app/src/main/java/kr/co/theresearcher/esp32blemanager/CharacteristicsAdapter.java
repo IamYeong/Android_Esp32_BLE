@@ -1,5 +1,6 @@
 package kr.co.theresearcher.esp32blemanager;
 
+import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class CharacteristicsAdapter extends RecyclerView.Adapter<CharacteristicViewHolder> {
@@ -17,11 +19,10 @@ public class CharacteristicsAdapter extends RecyclerView.Adapter<CharacteristicV
     private List<BluetoothGattCharacteristic> characteristics;
     private OnSelectCharacteristicListener listener;
 
-    public CharacteristicsAdapter(List<BluetoothGattCharacteristic> characteristics) {
-        this.characteristics = characteristics;
-    }
 
-    public CharacteristicsAdapter() {}
+    public CharacteristicsAdapter() {
+        characteristics = new ArrayList<>();
+    }
 
     public void setListener(OnSelectCharacteristicListener listener) {
         this.listener = listener;
@@ -49,7 +50,9 @@ public class CharacteristicsAdapter extends RecyclerView.Adapter<CharacteristicV
             public void onClick(View view) {
 
                 BluetoothGattCharacteristic characteristic = characteristics.get(position);
-                listener.onSelectCharacteristic(characteristic);
+                List<BluetoothGattCharacteristic> list = new ArrayList<>();
+                list.add(characteristic);
+                listener.onSelectCharacteristic(list);
             }
         });
 
